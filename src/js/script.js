@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { OBJLoader } from "three/examples/jsm/Addons.js";
 
 import floor1 from "../img/floor1.jpg";
 import floor2 from "../img/floor2.jpg";
@@ -7,6 +8,9 @@ import floor3 from "../img/floor3.jpg";
 import floor4 from "../img/floor4.jpg";
 import floor5 from "../img/floor5.jpg";
 import kabe from "../img/kabe.png";
+
+const doorObj = new URL("../img/door2.obj", import.meta.url);
+const doorObj3 = new URL("../img/door3.obj", import.meta.url);
 
 //dosya işlemleri
 const renderer = new THREE.WebGLRenderer();
@@ -92,14 +96,48 @@ const doorMultiMaterial = [
     new THREE.MeshBasicMaterial({ map: textureLoader.load(kabe) }),
 ];
 const door = new THREE.Mesh(doorGeometry, doorMultiMaterial);
-scene.add(door);
+// scene.add(door);
 door.position.y = 5.1;
 door.castShadow = true;
+
+const mousePosition = new THREE.Vector2();
+
+window.addEventListener("mousemove", (e) => {
+    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mousePosition.y = (e.clientX / window.innerHeight) * 2 + 1;
+});
+
+const rayCaster = new THREE.Raycaster();
+
+const assetLoader = new OBJLoader();
+
+const texture1 = textureLoader.load(floor1);
+
+assetLoader.load(doorObj3, function (object) {
+    object.scale.set(10, 8, 10);
+    object.rotation.y = Math.PI * 45;
+    // object.position.x = -5;
+    scene.add(object);
+
+    object.traverse(function (node) {
+        console.log(node);
+        if (node.isMesh) {
+            // node.material[0].color.set(0xff0000);
+            node.material[1].color.set(0xF5F5DC);
+            node.material[2].color.set(0xF5F5DC);
+            node.material[0].map = texture1;
+            node.material.needsUpdate = true;
+        }
+    });
+});
 
 function animate(time) {
     //animasyon fonksiyonu
     box.rotation.x = time / 1000;
     box.rotation.y = time / 1000;
+    rayCaster.setFromCamera(mousePosition, camera);
+    const intersects = rayCaster.intersectObjects(scene.children);
+
     renderer.render(scene, camera); //render ediyos
 }
 
