@@ -123,8 +123,8 @@ assetLoader.load(doorObj3, function (object) {
         console.log(node);
         if (node.isMesh) {
             // node.material[0].color.set(0xff0000);
-            node.material[1].color.set(0xF5F5DC);
-            node.material[2].color.set(0xF5F5DC);
+            node.material[1].color.set(0xf5f5dc);
+            node.material[2].color.set(0xf5f5dc);
             node.material[0].map = texture1;
             node.material.needsUpdate = true;
         }
@@ -143,4 +143,9 @@ function animate(time) {
 
 renderer.setAnimationLoop(animate);
 
-animate();
+window.addEventListener("resize", function () {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
